@@ -62,14 +62,6 @@ A test ruleset for Registration
     }
   }
 
-  rule join_section is active {
-    select when section add_request
-    pre {
-      net_id = event:attr("Net_ID")
-    }
-    if ent:taken >= ent:capacity then send_directive("waitlist")
-  }
-
   rule drop_section is active {
     select when section drop_request
     pre {
@@ -94,10 +86,8 @@ A test ruleset for Registration
       && not ent:section_id
     then noop()
     fired {
-      engine:signalEvent( // raise section event "assigned_id"
-        { "eci": meta:eci, "eid": 160,
-          "domain": "section", "type": "assigned_id",
-          "attrs": event:attrs() } )
+      raise section event "assigned_id"
+        attributes event:attrs()
     }
   }
 
@@ -111,9 +101,7 @@ A test ruleset for Registration
       ent:section_id := section_id;
 // this is where the section would initialize from a database
 // and raise section event "ready" once that is complete
-      engine:signalEvent( // raise section event "ready"
-        { "eci": meta:eci, "eid": 162,
-          "domain": "section", "type": "ready" } )
+      raise section event "ready"
     }
   }
 

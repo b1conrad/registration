@@ -79,11 +79,10 @@ ruleset app_section_collection {
              section_state = "creating"
     fired {
       ent:sections{[section_id,"state"]} := "creating";
-      engine:signalEvent( // raise pico event "new_child_request"
-         { "eci": meta:eci, "eid": 151,
-           "domain": "pico", "type": "new_child_request",
-           "attrs": { "dname": nameFromID(section_id), "color": "#FF69B4",
-                      "section_id": section_id } } )
+      raise pico event "new_child_request"
+        attributes { "dname": nameFromID(section_id),
+                     "color": "#FF69B4",
+                     "section_id": section_id }
     }
   }
  
@@ -132,10 +131,8 @@ ruleset app_section_collection {
       send_directive("section_deleted")
         with section_id = section_id
     fired {
-      engine:signalEvent( // raise pico event "delete_child_request"
-         { "eci": eci, "eid": 153,
-           "domain": "pico", "type": "delete_child_request",
-           "attrs": child_to_delete } );
+      raise pico event "delete_child_request"
+        attributes child_to_delete;
       ent:sections{[section_id]} := null
     }
   }
