@@ -90,12 +90,12 @@ ruleset app_section_collection {
     select when pico child_initialized
     pre {
       the_section = event:attr("new_child")
-      section_id = event:attr("section_id")
+      section_id = event:attr("rs_attrs"){"section_id"}
     }
     if section_id
     then
       event:send(
-        { "eci": the_section.eci, "eid": 155,
+        { "eci": the_section.eci, "eid": 255,
           "domain": "pico", "type": "new_ruleset",
           "attrs": { "rid": "app_section", "section_id": section_id } } )
     fired {
