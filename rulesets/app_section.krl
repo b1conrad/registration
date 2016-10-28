@@ -4,7 +4,7 @@ ruleset app_section {
     description <<
 A test ruleset for Registration
 >>
-    author "Aaron Rasmussen"
+    author "Aaron Rasmussen, Bruce Conrad"
     logging on
     shares sectionInfo, inRoster, __testing
     use module io.picolabs.pico alias wrangler
@@ -22,18 +22,21 @@ A test ruleset for Registration
       info.klog("Section Info: ")
     }
 
-    inRoster = function(Net_ID) {
-      net_id = Net_ID.defaultsTo("99-999-9999");
-      ent:roster.has([net_id])
+    inRoster = function(student_id) {
+      student_id = student_id.defaultsTo("99-999-9999");
+      ent:roster.has([student_id])
     }
 
     __testing =
       { "queries": [ { "name": "sectionInfo" },
                      { "name": "__testing" },
-                     { "name": "inRoster", "args": [ "Net_ID"] } ],
-        "events": [ { "domain": "section", "type": "config_empty", "attrs": [ "capacity" ] },
-                    { "domain": "section", "type": "add_request",  "attrs": [ "Net_ID" ] },
-                    { "domain": "section", "type": "drop_request", "attrs": [ "Net_ID" ] } ]
+                     { "name": "inRoster", "args": [ "student_id"] } ],
+        "events": [ { "domain": "section", "type": "config_empty",
+                      "attrs": [ "capacity" ] },
+                    { "domain": "section", "type": "add_request", 
+                      "attrs": [ "student_id" ] },
+                    { "domain": "section", "type": "drop_request",
+                      "attrs": [ "student_id" ] } ]
       }
   }
   
@@ -52,10 +55,12 @@ A test ruleset for Registration
   rule join_section is active {
     select when section add_request
     pre {
-      net_id = event:attr("Net_ID")
-      new_roster = ent:roster.union( [ net_id ] )
+      student_id = event:attr("student_id")
+      new_roster = ent:roster.union( [ student_id ] )
     }
-    if ent:taken < ent:capacity then noop()
+    if ent:taken < ent:capacity
+    then
+      send_directive("request_granted")
     fired {
       ent:roster := new_roster;
       ent:taken := ent:roster.length()
@@ -65,8 +70,8 @@ A test ruleset for Registration
   rule drop_section is active {
     select when section drop_request
     pre {
-      net_id = event:attr("Net_ID")
-      new_roster = ent:roster.difference( [ net_id ] )
+      student_id = event:attr("student_id")
+      new_roster = ent:roster.difference( [ student_id ] )
     }
     if new_roster.length() < ent:taken then noop()
     fired {
