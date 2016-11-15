@@ -100,19 +100,22 @@ A test ruleset for Registration
     select when section assigned_id
     pre {
       section_id = event:attr("section_id").klog("assigned id")
+      response = http:get("http://www.sanbachs.net/byu/picolabs/cgi-bin/sec-cap.cgi",
+                          { "sid": section_id } ).klog("response")
     }
-    noop()
-    always {
+    if response{"content"} then noop()
+    fired {
       ent:section_id := section_id;
-// this is where the section would initialize from a database
-// and raise section event "ready" once that is complete
+      ent:capacity := response{"content"}.extract(re#([0-9]*)#).head();
+      ent:roster := [];
+      ent:taken := 0;
       raise section event "ready"
     }
   }
 
   rule section_ready {
     select when section ready
-    if true
+    if ent:capacity
     then
       event:send( { "eci": wrangler:parent().eci, "eid": 163,
                     "domain": "section", "type": "ready",
