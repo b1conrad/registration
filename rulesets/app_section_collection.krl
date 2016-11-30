@@ -45,6 +45,22 @@ ruleset app_section_collection {
     }
   }
  
+  rule section_may_need_creation {
+    select when section may_need_creation
+    pre {
+      section_id = event:attr("section_id")
+      exists = ent:sections >< section_id
+    }
+    if not exists
+    then noop()
+    fired {
+      ent:sections{[section_id,"state"]} := "creating";
+      raise pico event "new_child_request"
+        attributes { "dname": nameFromID(section_id),
+                     "color": "#FF69B4",
+                     "section_id": section_id }
+    }
+  }
  
   rule section_already_exists {
     select when section needed
