@@ -10,12 +10,6 @@ ruleset app_registration {
                                 "attrs": [ "student_id" ] },
                               { "domain": "section", "type": "needed",
                                 "attrs": [ "student_id", "section_id" ] } ] }
-    newRegistrationChannel = function(student_id){
-      engine:newChannel(
-        { "name": student_id,
-          "type": "anon",
-          "pico_id": wrangler:myself().id } )
-    }
     sectionCollection = function(section_id){
       wrangler:children()[0] // for now assume it is the first child
     }
@@ -25,18 +19,6 @@ ruleset app_registration {
           "type": "anon",
           "pico_id": sectionCollection(section_id).id } )
     }
-  }
-
-  rule channel_needed {
-    select when channel needed
-    pre {
-      student_id = event:attr("student_id")
-      anon_channel = newRegistrationChannel(student_id)
-      anon_eci = anon_channel.id
-                             .klog("anon_eci issued:")
-    }
-    send_directive("registration")
-      with eci = anon_eci
   }
 
   rule section_needed {
