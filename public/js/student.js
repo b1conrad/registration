@@ -1,6 +1,6 @@
 $(document).ready(function() {
-  var host = $("#host").val();
-  $("#section_id").load("http://sanbachs.net/byu/picolabs/cgi-bin/sec-sel.cgi");
+  var host = "http://localhost:8084";
+  $("#section_id").load("http://bruceatbyu.com/cgi-bin/sec-sel.cgi");
   var $pre = $('pre');
   var log = function(m) {
     $pre.append(m).append("\r\n");
