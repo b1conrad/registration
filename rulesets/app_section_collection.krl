@@ -152,4 +152,42 @@ ruleset app_section_collection {
       ent:sections{[section_id]} := null
     }
   }
+
+  rule section_join {
+    select when section add_request
+    pre {
+      student_id = event:attr("student_id")
+      section_id = event:attr("section_id")
+      exists = ent:sections >< section_id
+      the_section = exists => ent:sections{section_id} | null
+    }
+    if exists then
+      event:send(
+        { "eci": the_section.eci, "eid": "join request",
+          "domain": "section", "type": "add_request",
+          "attrs": { "student_id": student_id, "section_id": section_id } } )
+    fired {
+      student_id.klog("added");
+      section_id.klog("to section")
+    }
+  }
+
+  rule section_drop {
+    select when section drop_request
+    pre {
+      student_id = event:attr("student_id")
+      section_id = event:attr("section_id")
+      exists = ent:sections >< section_id
+      the_section = exists => ent:sections{section_id} | null
+    }
+    if exists then
+      event:send(
+        { "eci": the_section.eci, "eid": "drop request",
+          "domain": "section", "type": "drop_request",
+          "attrs": { "student_id": student_id, "section_id": section_id } } )
+    fired {
+      student_id.klog("dropped");
+      section_id.klog("from section")
+    }
+  }
 }
