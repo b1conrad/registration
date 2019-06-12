@@ -24,7 +24,7 @@ ruleset CS452.student {
     subs_eci = function(){
       subs:wellKnown_Rx(){"id"}
     }
-    sections_eci = "rMExs9yvNFoyazx1HVyts"
+    sections_eci = "BtWAgUZ2cF2crWzyaK3DhA"
   }
   rule on_installation {
     select when wrangler ruleset_added where event:attr("rids") >< meta:rid
