@@ -2,6 +2,7 @@ ruleset CS452.student {
   meta {
     use module org.sovrin.agent alias agent
     use module io.picolabs.subscription alias subs
+    use module CS452.valid_sections alias check
     shares __testing, name, my_classes
   }
   global {
@@ -29,6 +30,17 @@ ruleset CS452.student {
     select when wrangler ruleset_added where event:attr("rids") >< meta:rid
     fired {
       ent:my_classes := {}
+    }
+  }
+  rule check_input_section_id {
+    select when registration add or registration drop
+    pre {
+      sid = event:attr("sid")
+      ok = check:valid(sid)
+    }
+    if not ok then send_directive("not in experiment",{"sid":sid})
+    fired {
+      last
     }
   }
   rule check_for_already_added {
