@@ -1,12 +1,13 @@
 ruleset CS452.sections {
   meta {
     use module io.picolabs.wrangler alias wrangler
-    shares __testing, sections
+    shares __testing, sections, count
   }
   global {
     __testing = { "queries":
       [ { "name": "__testing" }
       , { "name": "sections", "args": [] }
+      , { "name": "count", "args": [] }
       ] , "events":
       [ //{ "domain": "d1", "type": "t1" }
       //, { "domain": "d2", "type": "t2", "attrs": [ "a1", "a2" ] }
@@ -14,6 +15,9 @@ ruleset CS452.sections {
     }
     sections = function(){
       wrangler:children()
+    }
+    count = function(){
+      sections().length()
     }
   }
   rule forward_add_request {
